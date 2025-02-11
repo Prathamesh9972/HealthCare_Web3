@@ -1,6 +1,6 @@
 const express = require('express');
 const { addMedicine, updateMedicineStatus, sellMedicine, getMedicineDetails } = require('../controllers/medicineController');
-const authMiddleware = require('../middleware/authMiddleware');
+const authMiddleware = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 // Route to add medicine (only accessible by supplier)

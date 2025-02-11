@@ -1,14 +1,26 @@
-import { useState } from 'react'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './components/Login.jsx';
+import Dashboard from './components/Dashboard.jsx';
+import Register from './components/Register.jsx';
+import Distributor from './pages/distributor.jsx';
+import Manufacturer from './pages/manufacturer.jsx';
+import Supplier from './pages/supplier.jsx';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <>
-       <h1>Welcome to Healthcare Management System Using BlockChain Technology</h1>
-    </>
-  )
-}
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/distributor" element={<Distributor />} />
+        <Route path="/manufacturer" element={<Manufacturer />} />
+        <Route path="/supplier" element={<Supplier />} />
+        <Route path="/" element={<Login />} />
+      </Routes>
+    </Router>
+  );
+};
 
-export default App
+export default App;
