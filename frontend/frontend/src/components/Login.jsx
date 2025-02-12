@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -12,11 +14,11 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const roles = [
-    { id: 'admin', label: 'Admin', description: 'Full system access and control' },
-    { id: 'supplier', label: 'Supplier', description: 'Manage inventory and supplies' },
-    { id: 'manufacturer', label: 'Manufacturer', description: 'Production and assembly' },
-    { id: 'distributor', label: 'Distributor', description: 'Handle product distribution' },
-    { id: 'enduser', label: 'End User', description: 'Access and use products' }
+    { id: 'admin', label: 'Admin', description: 'Full system access and control', path: '/admin' },
+    { id: 'supplier', label: 'Supplier', description: 'Manage inventory and supplies', path: '/supplier' },
+    { id: 'manufacturer', label: 'Manufacturer', description: 'Production and assembly', path: '/manufacturer' },
+    { id: 'distributor', label: 'Distributor', description: 'Handle product distribution', path: '/distributor' },
+    { id: 'enduser', label: 'End User', description: 'Access and use products', path: '/dashboard' }
   ];
 
   const validateEmail = (email) => {
@@ -38,7 +40,7 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
@@ -59,7 +61,41 @@ const Login = () => {
       return;
     }
 
-    console.log('Form submitted:', formData);
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          role: formData.role
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || 'Login failed');
+      }
+
+      // Store token and user role
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userRole', formData.role);
+      
+      // Find the matching role and get its path
+      const selectedRole = roles.find(role => role.id === formData.role);
+      if (selectedRole) {
+        // Navigate to the role-specific page
+        navigate(selectedRole.path);
+      }
+      
+    } catch (error) {
+      setErrors({
+        submit: error.message
+      });
+    }
   };
 
   return (
@@ -181,6 +217,12 @@ const Login = () => {
                 ))}
               </div>
             </div>
+
+            {errors.submit && (
+              <div className="rounded-md bg-red-50 p-4">
+                <p className="text-sm text-red-700">{errors.submit}</p>
+              </div>
+            )}
 
             <div>
               <button
