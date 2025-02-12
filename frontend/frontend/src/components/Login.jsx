@@ -14,11 +14,11 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const roles = [
-    { id: 'admin', label: 'Admin', description: 'Full system access and control', path: '/admin' },
-    { id: 'supplier', label: 'Supplier', description: 'Manage inventory and supplies', path: '/supplier' },
-    { id: 'manufacturer', label: 'Manufacturer', description: 'Production and assembly', path: '/manufacturer' },
-    { id: 'distributor', label: 'Distributor', description: 'Handle product distribution', path: '/distributor' },
-    { id: 'enduser', label: 'End User', description: 'Access and use products', path: '/dashboard' }
+    { id: 'admin', label: 'Admin', description: 'Full system access and control' },
+    { id: 'supplier', label: 'Supplier', description: 'Manage inventory and supplies' },
+    { id: 'manufacturer', label: 'Manufacturer', description: 'Production and assembly' },
+    { id: 'distributor', label: 'Distributor', description: 'Handle product distribution' },
+    { id: 'enduser', label: 'End User', description: 'Access and use products' }
   ];
 
   const validateEmail = (email) => {
@@ -37,6 +37,25 @@ const Login = () => {
         ...prev,
         [name]: ''
       }));
+    }
+  };
+
+  const handleRoleRedirect = (role) => {
+    switch (role) {
+      case 'admin':
+        navigate('/admin');
+        break;
+      case 'supplier':
+        navigate('/supplier');
+        break;
+      case 'manufacturer':
+        navigate('/manufacturer');
+        break;
+      case 'distributor':
+        navigate('/distributor');
+        break;
+      default:
+        navigate('/');
     }
   };
 
@@ -80,16 +99,10 @@ const Login = () => {
         throw new Error(data.msg || 'Login failed');
       }
 
-      // Store token and user role
+      // Store token and handle redirect
       localStorage.setItem('token', data.token);
-      localStorage.setItem('userRole', formData.role);
-      
-      // Find the matching role and get its path
-      const selectedRole = roles.find(role => role.id === formData.role);
-      if (selectedRole) {
-        // Navigate to the role-specific page
-        navigate(selectedRole.path);
-      }
+      localStorage.setItem('userRole', formData.role); // Store role for future reference
+      handleRoleRedirect(formData.role);
       
     } catch (error) {
       setErrors({

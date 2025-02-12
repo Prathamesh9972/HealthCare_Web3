@@ -42,7 +42,7 @@ const Register = () => {
   });
 
   const roles = [
-    // { id: 'admin', icon: <UserCog size={20} />, label: 'Administrator', description: 'Full system access and control' },
+    { id: 'admin', icon: <UserCog size={20} />, label: 'Administrator', description: 'Full system access and control' },
     { id: 'supplier', icon: <Building2 size={20} />, label: 'Supplier', description: 'Manage and track supplies' },
     { id: 'manufacturer', icon: <Factory size={20} />, label: 'Manufacturer', description: 'Production and assembly management' },
     { id: 'distributor', icon: <Truck size={20} />, label: 'Distributor', description: 'Handle product distribution' },
