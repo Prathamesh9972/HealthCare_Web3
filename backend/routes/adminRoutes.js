@@ -18,7 +18,7 @@ const authenticateToken = (req, res, next) => {
 router.get('/distributors', authenticateToken, adminController.getDistributors);
 router.get('/suppliers', authenticateToken, adminController.getSuppliers);
 router.get('/manufacturers', authenticateToken, adminController.getManufacturers);
-router.delete('/:id', authenticateToken, adminController.deleteUser);
+router.delete('/:type/:id', authenticateToken, adminController.deleteUser);
 router.post('/', authenticateToken, adminController.createUser);
 router.put('/:id', authenticateToken, adminController.updateUser);
 

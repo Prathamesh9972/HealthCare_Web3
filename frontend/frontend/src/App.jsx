@@ -5,6 +5,7 @@ import Distributor from "./pages/distributor.jsx";
 import Manufacturer from "./pages/manufacturer.jsx";
 import Supplier from "./pages/supplier.jsx";
 import Admin from "./pages/admin.jsx";
+import Dashboard from "./components/Dashboard";
 
 import { useState } from "react";
 
@@ -23,6 +24,9 @@ const App = () => {
         <Route path="/manufacturer" element={<Manufacturer />} />
         <Route path="/supplier" element={<Supplier />} />
         <Route path="/admin" element={<Admin />} />
+
+
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
   );
