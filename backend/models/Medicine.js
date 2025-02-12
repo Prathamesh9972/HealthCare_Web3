@@ -1,45 +1,20 @@
+// models/Medicine.js
 const mongoose = require('mongoose');
 
-const MedicineSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    batchId: {
-        type: String,
-        required: true,
-        unique: true // Ensures the batchId is unique
-    },
-    supplier: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',  // References User schema (role: supplier)
-        required: true
-    },
-    manufacturer: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',  // References User schema (role: manufacturer)
-        required: true
-    },
-    distributor: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',  // References User schema (role: distributor)
-        required: true
-    },
-    enduser: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',  // References User schema (role: enduser)
-        default: null  // Initially null until purchased
-    },
-    qrCode: {
-        type: String,
-        required: true
-    },
-    status: {
-        type: String,
-        enum: ['inProduction', 'shipped', 'delivered', 'sold'],
-        default: 'inProduction'
-    }
-}, { timestamps: true });
+const medicineSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    batchId: { type: String, required: true, unique: true },
+    supplier: { type: String, required: true },
+    manufacturer: { type: String, required: true },
+    distributor: { type: String, required: true },
+    qrCode: { type: String, required: true },
+    status: { type: String, default: 'inProduction' },
+    enduser: { type: String, default: null },
+    transactionHash: { type: String, required: true },
+    saleHash: { type: String, default: null },
+    lastUpdateHash: { type: String, default: null }
+});
 
-module.exports = mongoose.model('Medicine', MedicineSchema);
+const Medicine = mongoose.model('Medicine', medicineSchema);
+
+module.exports = { Medicine };

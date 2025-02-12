@@ -1,11 +1,10 @@
-// For Web3.js version 4.x
-const { Web3 } = require('web3');
-const web3 = new Web3('http://localhost:8545'); // For local development with Ganache
-const { Medicine } = require('../models/Medicine');
-
-// Contract configuration
+// controllers/MedicineController.js
+const web3 = require('../config/blockchain');
+const { Medicine } = require('../models/Medicine'); // MongoDB model
 const contractABI = [/* your contract ABI here */];
-const contractAddress = '<your_contract_address>';
+const contractAddress = '<your_contract_address>'; // Update with your contract address
+
+// Instantiate the contract
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 // Function to add medicine

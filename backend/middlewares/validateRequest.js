@@ -63,7 +63,6 @@ const validateRequest = (validations) => {
                 }
             }
 
-            // If there are validation errors, return them
             if (errors.length > 0) {
                 return res.status(400).json({
                     success: false,

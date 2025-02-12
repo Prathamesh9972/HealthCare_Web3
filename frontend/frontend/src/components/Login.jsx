@@ -43,7 +43,7 @@ const Login = () => {
   const handleRoleRedirect = (role) => {
     switch (role) {
       case 'admin':
-        navigate('/admin');
+        navigate('/dashboard');
         break;
       case 'supplier':
         navigate('/supplier');

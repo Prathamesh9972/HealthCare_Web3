@@ -1,238 +1,163 @@
-import React, { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
-import './Dashboard.css';
+import React, { useState } from 'react';
+import { Plus, RefreshCcw, Search, Layout, X } from 'lucide-react';
+import AddMedicine from './AddMedicine';
+import UpdateMedicineStatus from './UpdateMedicineStatus';
+import MedicineDetails from './MedicineDetails';
 
 const Dashboard = () => {
-  const [contract, setContract] = useState(null);
-  const [account, setAccount] = useState('');
-  const [medicines, setMedicines] = useState([]);
-  const [newMedicine, setNewMedicine] = useState({
-    name: '',
-    batchId: '',
-    supplier: '',
-    manufacturer: '',
-    distributor: '',
-    qrCode: ''
-  });
-  const [statusUpdate, setStatusUpdate] = useState({
-    batchId: '',
-    status: ''
-  });
-  const [sellInfo, setSellInfo] = useState({
-    batchId: '',
-    enduser: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+    const [activeComponent, setActiveComponent] = useState(null);
 
-  // Contract ABI and address
-  const contractABI = [/* Add your contract ABI here */];
-  const contractAddress = "YOUR_CONTRACT_ADDRESS";
-
-  useEffect(() => {
-    const initialize = async () => {
-      try {
-        if (window.ethereum) {
-          await window.ethereum.request({ method: 'eth_requestAccounts' });
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const signer = provider.getSigner();
-          const healthcareContract = new ethers.Contract(
-            contractAddress,
-            contractABI,
-            signer
-          );
-          
-          setContract(healthcareContract);
-          const address = await signer.getAddress();
-          setAccount(address);
-        }
-      } catch (err) {
-        setError('Failed to connect to wallet');
-        console.error(err);
-      }
+    const closeComponent = () => {
+        setActiveComponent(null);
     };
 
-    initialize();
-  }, []);
+    const renderComponent = () => {
+        switch (activeComponent) {
+            case 'add':
+                return <AddMedicine />;
+            case 'update':
+                return <UpdateMedicineStatus />;
+            case 'details':
+                return <MedicineDetails />;
+            default:
+                return null;
+        }
+    };
 
-  const handleAddMedicine = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const tx = await contract.addMedicine(
-        newMedicine.name,
-        newMedicine.batchId,
-        newMedicine.supplier,
-        newMedicine.manufacturer,
-        newMedicine.distributor,
-        newMedicine.qrCode
-      );
-      await tx.wait();
-      setNewMedicine({
-        name: '',
-        batchId: '',
-        supplier: '',
-        manufacturer: '',
-        distributor: '',
-        qrCode: ''
-      });
-    } catch (err) {
-      setError('Failed to add medicine');
-      console.error(err);
-    }
-    setLoading(false);
-  };
+    const navItems = [
+        { id: 'add', label: 'Add Medicine', icon: Plus, color: 'blue' },
+        { id: 'update', label: 'Update Status', icon: RefreshCcw, color: 'green' },
+        { id: 'details', label: 'View Details', icon: Search, color: 'purple' }
+    ];
 
-  const handleUpdateStatus = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const tx = await contract.updateStatus(
-        statusUpdate.batchId,
-        statusUpdate.status
-      );
-      await tx.wait();
-      setStatusUpdate({ batchId: '', status: '' });
-    } catch (err) {
-      setError('Failed to update status');
-      console.error(err);
-    }
-    setLoading(false);
-  };
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <div className="bg-white shadow-md">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        <div className="flex items-center cursor-pointer" onClick={() => setActiveComponent(null)}>
+                            <Layout className="h-8 w-8 text-blue-600" />
+                            <h1 className="ml-3 text-2xl font-bold text-gray-900">
+                                Medicine Dashboard
+                            </h1>
+                        </div>
+                        <div className="hidden md:flex space-x-4">
+                            {navItems.map((item) => {
+                                const Icon = item.icon;
+                                return (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => setActiveComponent(item.id)}
+                                        className={`px-4 py-2 rounded-md flex items-center space-x-2 
+                                            ${activeComponent === item.id 
+                                                ? `bg-${item.color}-100 text-${item.color}-700` 
+                                                : 'text-gray-600 hover:bg-gray-100'
+                                            } transition-colors`}
+                                    >
+                                        <Icon className="h-5 w-5" />
+                                        <span>{item.label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  const handleSellMedicine = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const tx = await contract.sellMedicine(
-        sellInfo.batchId,
-        sellInfo.enduser
-      );
-      await tx.wait();
-      setSellInfo({ batchId: '', enduser: '' });
-    } catch (err) {
-      setError('Failed to sell medicine');
-      console.error(err);
-    }
-    setLoading(false);
-  };
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {!activeComponent ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Add Medicine Card */}
+                        <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                            <div className="p-6">
+                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                                    <Plus className="h-6 w-6 text-blue-600" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                    Add Medicine
+                                </h3>
+                                <p className="text-gray-600 mb-4">
+                                    Add new medicines to the inventory with detailed information
+                                </p>
+                                <button
+                                    onClick={() => setActiveComponent('add')}
+                                    className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center"
+                                >
+                                    <Plus className="h-5 w-5 mr-2" />
+                                    Add New Medicine
+                                </button>
+                            </div>
+                        </div>
 
-  const getMedicineDetails = async (batchId) => {
-    try {
-      const medicine = await contract.getMedicineDetails(batchId);
-      return medicine;
-    } catch (err) {
-      console.error(err);
-      return null;
-    }
-  };
+                        {/* Update Status Card */}
+                        <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                            <div className="p-6">
+                                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                                    <RefreshCcw className="h-6 w-6 text-green-600" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                    Update Status
+                                </h3>
+                                <p className="text-gray-600 mb-4">
+                                    Update the status of existing medicines in the inventory
+                                </p>
+                                <button
+                                    onClick={() => setActiveComponent('update')}
+                                    className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center"
+                                >
+                                    <RefreshCcw className="h-5 w-5 mr-2" />
+                                    Update Status
+                                </button>
+                            </div>
+                        </div>
 
-  return (
-    <div className="dashboard-container">
-      <header className="dashboard-header">
-        <h1>Healthcare Supply Chain Dashboard</h1>
-        <p>Connected Account: {account}</p>
-      </header>
-
-      {error && <div className="error-message">{error}</div>}
-
-      <div className="dashboard-grid">
-        <div className="dashboard-card">
-          <h2>Add New Medicine</h2>
-          <form onSubmit={handleAddMedicine}>
-            <input
-              type="text"
-              placeholder="Medicine Name"
-              value={newMedicine.name}
-              onChange={(e) => setNewMedicine({...newMedicine, name: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="Batch ID"
-              value={newMedicine.batchId}
-              onChange={(e) => setNewMedicine({...newMedicine, batchId: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="Supplier Address"
-              value={newMedicine.supplier}
-              onChange={(e) => setNewMedicine({...newMedicine, supplier: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="Manufacturer Address"
-              value={newMedicine.manufacturer}
-              onChange={(e) => setNewMedicine({...newMedicine, manufacturer: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="Distributor Address"
-              value={newMedicine.distributor}
-              onChange={(e) => setNewMedicine({...newMedicine, distributor: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="QR Code"
-              value={newMedicine.qrCode}
-              onChange={(e) => setNewMedicine({...newMedicine, qrCode: e.target.value})}
-            />
-            <button type="submit" disabled={loading}>
-              {loading ? 'Adding...' : 'Add Medicine'}
-            </button>
-          </form>
+                        {/* View Details Card */}
+                        <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                            <div className="p-6">
+                                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                                    <Search className="h-6 w-6 text-purple-600" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                    View Details
+                                </h3>
+                                <p className="text-gray-600 mb-4">
+                                    Search and view detailed information about medicines
+                                </p>
+                                <button
+                                    onClick={() => setActiveComponent('details')}
+                                    className="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors flex items-center justify-center"
+                                >
+                                    <Search className="h-5 w-5 mr-2" />
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="bg-white rounded-lg shadow-lg">
+                        <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                            <h2 className="text-xl font-semibold text-gray-900">
+                                {activeComponent === 'add' && 'Add New Medicine'}
+                                {activeComponent === 'update' && 'Update Medicine Status'}
+                                {activeComponent === 'details' && 'Medicine Details'}
+                            </h2>
+                            <button
+                                onClick={closeComponent}
+                                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                            >
+                                <X className="h-6 w-6" />
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            {renderComponent()}
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
-
-        <div className="dashboard-card">
-          <h2>Update Status</h2>
-          <form onSubmit={handleUpdateStatus}>
-            <input
-              type="text"
-              placeholder="Batch ID"
-              value={statusUpdate.batchId}
-              onChange={(e) => setStatusUpdate({...statusUpdate, batchId: e.target.value})}
-            />
-            <select
-              value={statusUpdate.status}
-              onChange={(e) => setStatusUpdate({...statusUpdate, status: e.target.value})}
-            >
-              <option value="">Select Status</option>
-              <option value="inProduction">In Production</option>
-              <option value="shipped">Shipped</option>
-              <option value="delivered">Delivered</option>
-              <option value="sold">Sold</option>
-            </select>
-            <button type="submit" disabled={loading}>
-              {loading ? 'Updating...' : 'Update Status'}
-            </button>
-          </form>
-        </div>
-
-        <div className="dashboard-card">
-          <h2>Sell Medicine</h2>
-          <form onSubmit={handleSellMedicine}>
-            <input
-              type="text"
-              placeholder="Batch ID"
-              value={sellInfo.batchId}
-              onChange={(e) => setSellInfo({...sellInfo, batchId: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="End User Address"
-              value={sellInfo.enduser}
-              onChange={(e) => setSellInfo({...sellInfo, enduser: e.target.value})}
-            />
-            <button type="submit" disabled={loading}>
-              {loading ? 'Processing...' : 'Sell Medicine'}
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Dashboard;
